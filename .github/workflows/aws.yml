@@ -1,0 +1,35 @@
+name: Deploy to EC2
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+        with:
+          node-version: '20'
+
+      - name: Set up SSH
+        uses: shimataro/ssh-key-action@v2
+        with:
+          key: ${{ secrets.SSH_ACCESS_AWS }}
+          known_hosts: '54.236.152.236'
+
+      - name: Deploy to EC2
+        run: |
+          ssh -o StrictHostKeyChecking=no ec2-user@54.236.152.236 '
+            cd CG-Front-end &&
+            git pull origin main &&
+            sudo docker-compose down &&
+            sudo docker rmi cg-front-end-web:latest &&
+            rm -rf node_modules &&
+            npm install &&
+            NODE_OPTIONS=--max-old-space-size=512 npm run build &&
+            sudo docker-compose up -d
+          '

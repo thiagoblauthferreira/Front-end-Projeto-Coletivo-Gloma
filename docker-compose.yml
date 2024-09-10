@@ -1,0 +1,15 @@
+services:
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./build:/usr/share/nginx/html
+      - ./certificados:/etc/nginx/ssl
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf
+      - /etc/nginx/ssl
+    environment:
+      - NGINX_SSL_PASSWORD_FILE=/etc/nginx/ssl/senha.txt
