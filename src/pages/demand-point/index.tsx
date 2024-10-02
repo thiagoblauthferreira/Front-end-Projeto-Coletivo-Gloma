@@ -106,6 +106,7 @@ export default function DemandsPointScreen() {
         ...filter.current,
       });
       const respData = resp.data;
+      console.log(resp)
       const respTotal = resp.total;
       setDemandPoints((currentData) => [...currentData, ...respData]);
       setInfinitScroll(respTotal > limit ? respData.length > 0 : false);
