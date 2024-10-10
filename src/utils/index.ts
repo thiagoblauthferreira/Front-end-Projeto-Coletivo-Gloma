@@ -29,3 +29,4 @@ export const formatDate = (
 
   return parsedDate.format(format);
 };
+
