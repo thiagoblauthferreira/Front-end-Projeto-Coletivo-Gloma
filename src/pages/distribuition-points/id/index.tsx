@@ -13,6 +13,7 @@ import { IDistribuitionPoint } from "../../../interfaces/distriuition-points";
 import { IProductsInitialData } from "../../../components/pages/DistribuitionPoints/context/interface";
 import { listProducts } from "../../../services/products.service";
 import { toast } from "react-toastify";
+import { TabsStock } from "../../../components/pages/DistribuitionPoints/tabs/TabStock";
 
 const initialData = {
   data: [],
@@ -65,6 +66,11 @@ function DistribuitionPointScreen() {
       key: "products",
       label: "Produtos",
       children: <TabProducts />,
+    },
+    {
+      key: "stock",
+      label: "Estoque",
+      children: <TabsStock />,
     },
   ];
 
