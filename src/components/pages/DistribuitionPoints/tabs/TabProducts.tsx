@@ -7,8 +7,14 @@ import { useDistribuitionPointProvider } from "../context";
 import { useAuthProvider } from "../../../../context/Auth";
 import { IProduct } from "../../../../interfaces/products";
 import { IoWarningOutline } from "react-icons/io5";
+import productOptions from "../../../modals/Product/product.list";
 
-export function TabProducts() {
+interface TabProductsProps {
+  statusSolicitation: "requested" | "received";
+  distributionPointId?: string; 
+  isCoordinator?: boolean;
+}
+export function TabProducts({ distributionPointId, statusSolicitation }: TabProductsProps) {
   const {
     handleFilter,
     handleProducts,
@@ -39,6 +45,17 @@ export function TabProducts() {
       setOpenModalConfirmActionProduct(true);
     }
   };
+// Filtrando os produtos com base no status
+const filteredProducts = products.data.filter((product) => {
+ 
+  
+  if (statusSolicitation === "requested") {    
+    return product.status !== "received";
+  } else if (statusSolicitation === "received") {
+    return product.status !== "requested";
+  }
+  return true; 
+});
 
   return (
     <div>
@@ -60,22 +77,29 @@ export function TabProducts() {
               {
                 optionKey: "type",
                 type: "select",
-                options: [
-                  { label: "Todos", value: "" },
-                  { label: "Perecível", value: "perishable" },
-                  { label: "Não perecível", value: "not_perishable" },
-                ],
+                options: productOptions
               },
             ]}
           />
 
-          {currentUser && (
+          {currentUser?.isDonor && (           
             <Button
               text="Doar produto"
               className="bg-black text-white"
               disabled={requesting}
               onClick={() => setOpenModalProduct(true)}
             />
+          
+          )}
+
+            {currentUser?.isCoordinator && (           
+            <Button
+              text="Doar/Solicitar produto"
+              className="bg-black text-white"
+              disabled={requesting}
+              onClick={() => setOpenModalProduct(true)}
+            />
+          
           )}
         </div>
 
@@ -89,9 +113,10 @@ export function TabProducts() {
       </div>
 
       <div>
+        
         <TableProducts
-          total={products.total}
-          dataSource={products.data}
+          total={filteredProducts.length}
+          dataSource={filteredProducts}
           handleDeleteProduct={(productId) => onProduct(productId, "delete")}
           handleUpdateProduct={(productId) => onProduct(productId, "update")}
           onPaginate={handleProducts}
@@ -104,7 +129,7 @@ export function TabProducts() {
         open={openModalProduct}
         close={() => setOpenModalProduct(false)}
         onSubmit={handleCreateProduct}
-      />
+        distributionPointId={distributionPointId} isCoordinator={currentUser?.isCoordinator}      />
 
       <ModalProduct
         open={openModalUpdateProduct}
@@ -112,7 +137,7 @@ export function TabProducts() {
         onSubmit={(data) => handleUpdateProduct(product?.id || "", data)}
         modalType="update"
         product={product}
-      />
+        distributionPointId={distributionPointId} isCoordinator={currentUser?.isCoordinator}      />
 
       <ModalConfirmAction
         title="Tem certeza que deseja remover esse produto?"

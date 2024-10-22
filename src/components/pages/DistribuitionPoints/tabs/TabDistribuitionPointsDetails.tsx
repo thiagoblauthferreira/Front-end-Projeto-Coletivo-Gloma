@@ -1,5 +1,6 @@
 import { useDistribuitionPointProvider } from "../context";
 import { formatDate } from "../../../../utils";
+import Graphic from "../../../graphic/Graphic";
 
 const Description = ({ title, text = "" }: { title: string; text?: string }) => {
   return (
@@ -10,29 +11,32 @@ const Description = ({ title, text = "" }: { title: string; text?: string }) => 
 };
 
 export function TabDistribuitionPointDetails() {
-  const { distribuitionPoint } = useDistribuitionPointProvider();
+  const { distribuitionPoint, statistics } = useDistribuitionPointProvider();
+  console.log(statistics)
 
-  console.log(distribuitionPoint);
-
-  return (
+   return (
     <div className="my-5">
       <div className="stats bg-white stats-vertical md:stats-horizontal shadow w-full">
         <div className="stat">
-          <div className="stat-title">Total Page Views</div>
-          <div className="stat-value">89,400</div>
-          <div className="stat-desc">21% more than last month</div>
+          <div className="stat-title">Total de produtos recebidos:</div>
+          <div className="stat-value">{statistics.totalQuantityProducts}</div>
+          <div className="stat-desc">*Considera-se todos os tipos de produtos.</div>
         </div>
         <div className="stat">
-          <div className="stat-title">Total Page Views</div>
-          <div className="stat-value">89,400</div>
-          <div className="stat-desc">21% more than last month</div>
-        </div>
-        <div className="stat">
-          <div className="stat-title">Total Page Views</div>
-          <div className="stat-value">89,400</div>
-          <div className="stat-desc">21% more than last month</div>
-        </div>
+          <div className="stat-title">Total de produtos recebidos em peso:</div>
+          <div className="stat-value">{statistics.totalProducts} kg</div>
+          <div className="stat-desc">*Considera-se todos os tipos alimentícios.</div>
+        </div>       
       </div>
+      <div className="stats bg-white stats-vertical md:stats-horizontal shadow w-full">
+       <div className="flex flex-col items-center justify-center w-full">
+        <h2>Dados referentes a produtos não alimentícios doados.</h2>
+        <Graphic data={statistics} />
+        </div>
+          
+      </div>
+
+      
 
       <h2 className="py-8 pb-4 font-bold text-lg">Ponto de distribuição</h2>
 

@@ -27,3 +27,7 @@ export function listDistribuitionPoints(params: ISearchDistribuitionPoint) {
 export function deleteDistribuitionPoint(distribuitionPointId: string) {
   return del(`/distribuitionPoint/${distribuitionPointId}`);
 }
+
+export function listStaticsDistribuitionPointRequested(distribuitionPointId: string) {
+  return get(`/distribuitionPoint/${distribuitionPointId}/statistic-requested`);
+}

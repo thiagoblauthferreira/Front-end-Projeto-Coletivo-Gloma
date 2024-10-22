@@ -6,6 +6,7 @@ import {
 } from "./interface";
 import {
   deleteDistribuitionPoint,
+  listStaticsDistribuitionPointRequested,
   updateDistribuitionPoints,
 } from "../../../../services/distribuition-points.service";
 import { IProductCreate, IProductUpdate } from "../../../../interfaces/products";
@@ -24,6 +25,7 @@ import {
 import { toast } from "react-toastify";
 import { toastMessage } from "../../../../helpers/toast-message";
 import { IPaginate } from "../../../common/Table/interface";
+import { IProductInventory } from "../../../../interfaces/statistics";
 
 const DistribuitionPointContext = React.createContext<IDistribuitionPointProvider>(
   {} as IDistribuitionPointProvider
@@ -33,6 +35,7 @@ export function DistribuitionPointProvider({
   children,
   initialDistribuitionPoint,
   initialProducts,
+  initialIStatistics
 }: IContextProvider) {
   const { id = "" } = useParams();
   const navigation = useNavigate();
@@ -49,6 +52,7 @@ export function DistribuitionPointProvider({
   const [openModalUpdateProduct, setOpenModalUpdateProduct] =
     React.useState<boolean>(false);
   const [products, setProducts] = React.useState<IProductsInitialData>(initialProducts);
+  const [statistics, setStatistics] = React.useState<IProductInventory>(initialIStatistics);
   const [distribuitionPoint, setDistribuitionPoint] = React.useState<IDistribuitionPoint>(
     initialDistribuitionPoint
   );
@@ -246,6 +250,21 @@ export function DistribuitionPointProvider({
     }
   };
 
+  const handleStatistics = async (distribuitionPointId: string) => {
+    if (requesting) {
+      toast.warn(toastMessage.REQUESTING);
+      return;
+    }
+    try {
+      const data = await listStaticsDistribuitionPointRequested(distribuitionPointId)
+      console.log(data)
+      setStatistics(data);
+    } catch (error) {
+      console.log(error)
+      toast.error(toastMessage.INTERNAL_SERVER_ERROR);
+    }
+
+  }
   return (
     <DistribuitionPointContext.Provider
       value={{
@@ -262,6 +281,7 @@ export function DistribuitionPointProvider({
         handleUpdateDistribuitionPoint,
         handleDeleteDistribuitionPoint,
         updateDistribuitionPointState,
+        handleStatistics,
         products,
         openModalProduct,
         openModalUpdateProduct,
@@ -269,6 +289,7 @@ export function DistribuitionPointProvider({
         openModalConfirmActionDP,
         distribuitionPoint,
         requesting,
+        statistics,
       }}
     >
       {children}

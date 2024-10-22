@@ -1,14 +1,21 @@
 import React from "react";
-import { Alert, Button } from "../../../common";
+import { Alert } from "../../../common";
 import { ModalConfirmAction, ModalProduct } from "../../../modals";
 import { Search } from "../../../search";
-import { TableProducts } from "../../../tables/products";
 import { useDistribuitionPointProvider } from "../context";
 import { useAuthProvider } from "../../../../context/Auth";
-import { IProduct } from "../../../../interfaces/products";
+import { IProduct, IProductCreate } from "../../../../interfaces/products";
 import { IoWarningOutline } from "react-icons/io5";
+import productOptions from "../../../modals/Product/product.list";
+import { TableRequestesProducts } from "../../../tables/productsRequested";
+import { ModalDonateProduct } from "../../../modals/Product/Donate";
 
-export function TabsStock() {
+interface TabProductsRequestedProps {
+  statusSolicitation: "requested" | "received";
+  distributionPointId?: string; 
+  isCoordinator?: boolean;
+}
+export function TabProductsRequested({ distributionPointId, statusSolicitation }: TabProductsRequestedProps) {
   const {
     handleFilter,
     handleProducts,
@@ -24,21 +31,34 @@ export function TabsStock() {
     openModalUpdateProduct,
     openModalConfirmActionProduct,
     requesting,
+    distribuitionPoint
   } = useDistribuitionPointProvider();
   const { currentUser } = useAuthProvider();
 
   const [product, setProduct] = React.useState<IProduct>();
 
-  const onProduct = async (productId: string, action: "delete" | "update") => {
+  const onProduct = async (productId: string, action: "delete" | "update" | "donate") => {
     const product = await handleProduct(productId);
     setProduct(product);
 
     if (action === "update") {
       setOpenModalUpdateProduct(true);
-    } else {
+    } 
+     else {
       setOpenModalConfirmActionProduct(true);
     }
   };
+// Filtrando os produtos com base no status
+const filteredProducts = products.data.filter((product) => {
+ 
+  
+  if (statusSolicitation === "requested") {    
+    return product.status !== "received";
+  } else if (statusSolicitation === "received") {
+    return product.status !== "requested";
+  }
+  return true; 
+});
 
   return (
     <div>
@@ -60,23 +80,10 @@ export function TabsStock() {
               {
                 optionKey: "type",
                 type: "select",
-                options: [
-                  { label: "Todos", value: "" },
-                  { label: "Perecível", value: "perishable" },
-                  { label: "Não perecível", value: "not_perishable" },
-                ],
+                options: productOptions
               },
             ]}
-          />
-
-          {currentUser && (
-            <Button
-              text="Doar produto"
-              className="bg-black text-white"
-              disabled={requesting}
-              onClick={() => setOpenModalProduct(true)}
-            />
-          )}
+          />         
         </div>
 
         {!currentUser && (
@@ -89,11 +96,13 @@ export function TabsStock() {
       </div>
 
       <div>
-        <TableProducts
-          total={products.total}
-          dataSource={products.data}
+        
+        <TableRequestesProducts
+          total={filteredProducts.length}
+          dataSource={filteredProducts}
           handleDeleteProduct={(productId) => onProduct(productId, "delete")}
           handleUpdateProduct={(productId) => onProduct(productId, "update")}
+          handleDonorProduct={(productId) => onProduct(productId, "donate")}
           onPaginate={handleProducts}
           requesting={requesting}
           textNotFound="Nenhum produto encontrado"
@@ -104,7 +113,8 @@ export function TabsStock() {
         open={openModalProduct}
         close={() => setOpenModalProduct(false)}
         onSubmit={handleCreateProduct}
-      />
+        distributionPointId={distributionPointId}
+        isCoordinator={currentUser?.isCoordinator}/>
 
       <ModalProduct
         open={openModalUpdateProduct}
@@ -112,12 +122,19 @@ export function TabsStock() {
         onSubmit={(data) => handleUpdateProduct(product?.id || "", data)}
         modalType="update"
         product={product}
-      />
+        distributionPointId={distributionPointId}
+        isCoordinator={currentUser?.isCoordinator}      />
 
       <ModalConfirmAction
         title="Tem certeza que deseja remover esse produto?"
         open={openModalConfirmActionProduct}
         close={() => setOpenModalConfirmActionProduct(false)}
+        onSubmit={() => handleDeleteProduct(product?.id || "")}
+      />
+
+      <ModalDonateProduct 
+        close={() => setOpenModalConfirmActionProduct(false)}
+        open={openModalConfirmActionProduct}
         onSubmit={() => handleDeleteProduct(product?.id || "")}
       />
     </div>

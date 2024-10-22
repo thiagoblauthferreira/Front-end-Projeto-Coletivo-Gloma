@@ -7,6 +7,7 @@ import {
   IProductCreate,
   IProductUpdate,
 } from "../../../../interfaces/products";
+import { IProductInventory } from "../../../../interfaces/statistics";
 import { IPaginate } from "../../../common/Table/interface";
 
 export interface IProductsInitialData {
@@ -28,6 +29,7 @@ export interface IDistribuitionPointProvider {
   handleUpdateDistribuitionPoint: (data: IDistribuitionPointCreate) => void;
   handleDeleteDistribuitionPoint: (distribuitionPointId: string) => void;
   updateDistribuitionPointState: (data: any) => void;
+  handleStatistics: (data: any) => void;
   openModalProduct: boolean;
   openModalUpdateProduct: boolean;
   openModalConfirmActionProduct: boolean;
@@ -35,10 +37,12 @@ export interface IDistribuitionPointProvider {
   products: IProductsInitialData;
   distribuitionPoint: IDistribuitionPoint;
   requesting: boolean;
+  statistics: IProductInventory;
 }
 
 export interface IContextProvider {
   children: React.ReactNode;
   initialDistribuitionPoint: IDistribuitionPoint;
   initialProducts: IProductsInitialData;
+  initialIStatistics: IProductInventory;
 }

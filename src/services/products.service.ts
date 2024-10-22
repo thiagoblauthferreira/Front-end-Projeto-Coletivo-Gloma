@@ -20,3 +20,8 @@ export function deleteProduct(productId: string) {
 export function updateProduct(productId: string, data: IProductUpdate) {
   return patch(`/product/${productId}`, { data });
 }
+
+
+export function donateProduct(productId: string, data: IProductCreate) {
+  return patch(`/product/${productId}`, { data });
+}
