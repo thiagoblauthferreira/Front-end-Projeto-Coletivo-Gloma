@@ -42,7 +42,7 @@ export function ModalProduct({
     distributionPointId ? data.distributionPointId = distributionPointId : data.distributionPointId = "" ;
     if(!isPerishable){
       delete data.weight
-    }
+    }  
     onSubmit(data);
     setIsPerishable(true)
     reset();    
@@ -52,18 +52,18 @@ export function ModalProduct({
       setIsPerishable(true);
     }else{
       setIsPerishable(false);
-    }
-    
+    }    
   };
 
   React.useEffect(() => {
     if (product && modalType === "update") {
       for (const k in product) {
         const key = k as keyof IProduct;
-        setValue(key as any, product[key]);
+        setValue(key as any, product[key]?.toString());
       }
+      handleChange(product.type);
     }
-  }, [product, modalType]);
+  }, [product, modalType, setValue]);
 
   const weight: string = watch("weight") ?? "";
 
@@ -115,7 +115,7 @@ export function ModalProduct({
               errors={errors}
             />
 
-            {isPerishable && (
+            {(isPerishable || product?.type === 'perishable' || product?.type === 'non_perishable') && (
               <Input
                 label="Peso: "
                 placeholder="Digite o peso: 10.50"

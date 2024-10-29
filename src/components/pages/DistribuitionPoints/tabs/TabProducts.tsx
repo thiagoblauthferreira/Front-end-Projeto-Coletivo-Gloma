@@ -46,8 +46,7 @@ export function TabProducts({ distributionPointId, statusSolicitation }: TabProd
     }
   };
 // Filtrando os produtos com base no status
-const filteredProducts = products.data.filter((product) => {
- 
+const filteredProducts = products.data.filter((product) => { 
   
   if (statusSolicitation === "requested") {    
     return product.status !== "received";

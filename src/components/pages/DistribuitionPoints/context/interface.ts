@@ -5,6 +5,7 @@ import {
 import {
   IProduct,
   IProductCreate,
+  IProductDonate,
   IProductUpdate,
 } from "../../../../interfaces/products";
 import { IProductInventory } from "../../../../interfaces/statistics";
@@ -20,9 +21,11 @@ export interface IDistribuitionPointProvider {
   setOpenModalUpdateProduct: (event: boolean) => void;
   setOpenModalConfirmActionDP: (event: boolean) => void;
   setOpenModalConfirmActionProduct: (event: boolean) => void;
+  setOpenModalDonateProduct: (event: boolean) => void;
   handleFilter: (data: any) => void;
   handleProducts: (data: IPaginate) => void;
   handleCreateProduct: (data: IProductCreate) => void;
+  handleDonateProduct: (data: IProductDonate) => void;
   handleUpdateProduct: (productId: string, data: IProductUpdate) => void;
   handleDeleteProduct: (productId: string) => void;
   handleProduct: (productId: string) => Promise<IProduct>;
@@ -34,6 +37,7 @@ export interface IDistribuitionPointProvider {
   openModalUpdateProduct: boolean;
   openModalConfirmActionProduct: boolean;
   openModalConfirmActionDP: boolean;
+  openModalDonateProduct: boolean;
   products: IProductsInitialData;
   distribuitionPoint: IDistribuitionPoint;
   requesting: boolean;

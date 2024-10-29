@@ -60,8 +60,7 @@ export function TabDistribuitionPointSettings() {
               grid grid-cols-1 gap-4 py-3
               md:grid-cols-2
             `}
-          >
-            <div className="h-60 w-full rounded-2xl bg-slate-600"></div>
+          >            
             <div className="grid gap-4 grid-rows-2">
               <Input
                 label="Nome: "
@@ -164,7 +163,6 @@ export function TabDistribuitionPointSettings() {
           />
         </div>
       </div>
-
       <ModalConfirmAction
         title="Tem certeza que deseja excluir esse ponto de distribuição?"
         open={openModalConfirmActionDP}

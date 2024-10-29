@@ -10,7 +10,7 @@ import { productTypeTranslations } from "./translate";
 export interface ITableProductsRequestesProps extends ITable {
   handleDeleteProduct: (productId: string) => void;
   handleUpdateProduct: (productId: string) => void;
-  handleDonorProduct?: (productId: string) => void;
+  handleDonorProduct: (productId: string) => void;
 }
 
 const btnStyleDefault =
@@ -37,8 +37,8 @@ export function TableRequestesProducts({
       title: "Tipo",
       dataIndex: "type",
       render: (type) => {
-        // Usando o mapeamento para traduzir o tipo
-        return <p>{productTypeTranslations[type] || type}</p>; // Se o tipo não for encontrado, exibe o valor original
+        
+        return <p>{productTypeTranslations[type] || type}</p>; 
       },
     },
     {
@@ -112,7 +112,7 @@ export function TableRequestesProducts({
               onClick={() =>
                 !props.requesting &&
                 product.creator?.id === currentUser?.id &&
-                handleDeleteProduct(product.id)
+                handleDonorProduct(product.id)
               }
               disabled={product.creator?.id !== currentUser?.id || props.requesting}
             >

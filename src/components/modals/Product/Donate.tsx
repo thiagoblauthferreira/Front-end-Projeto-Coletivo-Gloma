@@ -1,16 +1,15 @@
 import React from "react";
 import { useForm } from "react-hook-form";
-import { Button, Input, Modal, Select, Textarea } from "../../common";
-import { IProduct, IProductCreate } from "../../../interfaces/products";
+import { Button, Input, Modal } from "../../common";
+import { IProduct, IProductDonate } from "../../../interfaces/products";
 import { productSchema } from "../../../validators";
 import { zodResolver } from "@hookform/resolvers/zod";
-import productOptions from "./product.list";
 import { weightMask } from "../../../utils/masks";
 
 interface IModalProduct {
   close: () => void;
   open: boolean;
-  onSubmit: (data: IProductCreate) => void;
+  onSubmit: (data: IProductDonate) => void;
   modalType?: "create";
   product?: IProduct;
   distributionPointId?: string;
@@ -22,9 +21,7 @@ export function ModalDonateProduct({
   open,
   onSubmit,
   modalType = "create",
-  product,
-  distributionPointId,
-  isCoordinator
+  product
   
 }: IModalProduct) {
   const {
@@ -34,37 +31,19 @@ export function ModalDonateProduct({
     formState: { errors },
     reset,
     watch,
-  } = useForm<IProductCreate>({ resolver: zodResolver(productSchema) });
-  const [isPerishable, setIsPerishable] = React.useState(true);
+  } = useForm<IProductDonate>();
 
-  const onFinish = (data: IProductCreate, actionType: "requested" | "received") => {
-    data.status = actionType
-    distributionPointId ? data.distributionPointId = distributionPointId : data.distributionPointId = "" ;
-    if(!isPerishable){
-      delete data.weight
+  const onFinish = (data: IProductDonate) => {   
+    const formData = { ...data, productReferenceID: product!.id }; 
+    if(product?.type ==='non_perishable' || product?.type === 'perishable'){
+      onSubmit(formData);         
     }
-    onSubmit(data);
-    setIsPerishable(true)
-    reset();    
+    delete formData.weight;
+
+    onSubmit(formData);
+    reset();      
   };
-  const handleChange = (value: string) => {
-    if(value === 'perishable' || value === 'non_perishable'){
-      setIsPerishable(true);
-    }else{
-      setIsPerishable(false);
-    }
-    
-  };
-
-  React.useEffect(() => {
-    if (product) {
-      for (const k in product) {
-        const key = k as keyof IProduct;
-        setValue(key as any, product[key]);
-      }
-    }
-  }, [product, modalType]);
-
+  
   const weight: string = watch("weight") ?? "";
 
   React.useEffect(() => {
@@ -90,23 +69,8 @@ export function ModalDonateProduct({
             grid grid-flow-row auto-rows-max
             gap-2
           `}
-          onSubmit={handleSubmit((data) => onFinish(data, "requested"))}>
-          <Input
-            label="Nome: "
-            placeholder="Digite o nome"
-            {...register("name")}
-            errors={errors}
-          />
-
-          <Select
-            label="Tipo: "
-            {...register("type")}
-            options={productOptions}
-            onChange={(e) => handleChange(e.target.value)}
-            errors={errors}
-          />
-
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+          onSubmit={handleSubmit(onFinish)}>
+         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <Input
               label="Quantidade: "
               placeholder="Digite a quantidade"
@@ -115,7 +79,7 @@ export function ModalDonateProduct({
               errors={errors}
             />
 
-            {isPerishable && (
+            {(product?.type === 'perishable' || product?.type === 'non_perishable') && (
               <Input
                 label="Peso: "
                 placeholder="Digite o peso: 10.50"
@@ -125,22 +89,12 @@ export function ModalDonateProduct({
             )}
           </div>
 
-         
-
           <Button
             type="submit"
             text={`${modalType === "create" ? "Doar" : "Atualizar"} produto`}
-            onClick={handleSubmit((data) => onFinish(data, "received"))}
+            onClick={handleSubmit((data) => onFinish(data))}
             className="w-full mt-4 bg-black text-white"
           />
-          {isCoordinator ? (
-          <Button
-            type="button"
-            text="Requisitar produto"
-            onClick={handleSubmit((data) => onFinish(data, "requested"))}
-            className="w-full mt-4 bg-black text-white"
-          />
-        ) : null}
         </form>
       </div>
     </Modal>

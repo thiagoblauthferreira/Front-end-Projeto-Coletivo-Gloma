@@ -1,7 +1,7 @@
 import { IParamsDefault } from "./default";
 import { IUser } from "./user";
 
-export type ProductType = "perishable" | "not_perishable";
+export type ProductType = "perishable" | "non_perishable";
 export type StatusType = "requested" | "received";
 export interface IProductCreate {
   name: string;
@@ -40,3 +40,11 @@ export interface ISearchProducts extends IParamsDefault {
   type?: string;
   status?: string;
 }
+
+
+export interface IProductDonate {
+  quantity: number;  
+  productReferenceID: string;
+  weight?: string | null;
+}
+

@@ -1,6 +1,6 @@
 import { useDistribuitionPointProvider } from "../context";
 import { formatDate } from "../../../../utils";
-import Graphic from "../../../graphic/Graphic";
+import Graphic from "../../../charts/Chart";
 
 const Description = ({ title, text = "" }: { title: string; text?: string }) => {
   return (
@@ -12,7 +12,6 @@ const Description = ({ title, text = "" }: { title: string; text?: string }) => 
 
 export function TabDistribuitionPointDetails() {
   const { distribuitionPoint, statistics } = useDistribuitionPointProvider();
-  console.log(statistics)
 
    return (
     <div className="my-5">
@@ -28,22 +27,27 @@ export function TabDistribuitionPointDetails() {
           <div className="stat-desc">*Considera-se todos os tipos alimentícios.</div>
         </div>       
       </div>
-      <div className="stats bg-white stats-vertical md:stats-horizontal shadow w-full">
-       <div className="flex flex-col items-center justify-center w-full">
-        <h2>Dados referentes a produtos não alimentícios doados.</h2>
-        <Graphic data={statistics} />
-        </div>
-          
+      <div className="stats bg-white shadow w-full">
+        <div className="flex flex-col md:flex-row items-center justify-center w-full mb-4">
+          <div className="flex items-center justify-center w-full md:w-1/2 mb-4 md:mb-0">
+            <Graphic data={statistics} type={"not_food"} />
+          </div>         
+        </div>        
+      </div>
+      <div className="stats bg-white shadow w-full">
+        <div className="flex flex-col md:flex-row items-center justify-center w-full mb-4">
+        <div className="flex items-center justify-center w-full md:w-1/2">
+            <Graphic data={statistics} type={"food"} />
+          </div>      
+        </div>        
       </div>
 
-      
-
-      <h2 className="py-8 pb-4 font-bold text-lg">Ponto de distribuição</h2>
+    <h2 className="py-8 pb-4 font-bold text-lg">Ponto de distribuição</h2>
 
       <div className="card bg-white rounded-xl shadow">
         <div className="card-body p-4 grid grid-cols-1 gap-4 md:grid-cols-2 md:p-8">
-          <div className="h-60 w-full rounded-2xl bg-slate-600"></div>
-          <div className="space-y-4">
+          
+          <div className="space-y-4 w-full">
             <Description title="Nome" text={distribuitionPoint.name} />
             <Description title="Telefone" text={distribuitionPoint.phone} />
             <Description title="Descrição" text={distribuitionPoint.description} />
@@ -54,7 +58,7 @@ export function TabDistribuitionPointDetails() {
           </div>
 
           <div className="col-span-1">
-            <h2 className="py-4 font-bold text-lg">Endereço:</h2>
+            <h2 className="font-bold text-lg">Endereço:</h2>
             <div className="space-y-4 pl-4">
               <Description title="CEP" text={distribuitionPoint.address.cep} />
               <Description title="Estado" text={distribuitionPoint.address.estado} />
@@ -77,7 +81,7 @@ export function TabDistribuitionPointDetails() {
           </div>
 
           <div className="col-span-1">
-            <h2 className="py-4 font-bold text-lg">Responsável:</h2>
+            <h2 className="font-bold text-lg">Responsável:</h2>
             <div className="space-y-4 pl-4">
               <Description title="Nome" text={distribuitionPoint.creator.name} />
               <Description title="Email" text={distribuitionPoint.creator.email} />

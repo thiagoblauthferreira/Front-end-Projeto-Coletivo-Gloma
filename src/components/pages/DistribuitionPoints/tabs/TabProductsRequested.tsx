@@ -4,7 +4,7 @@ import { ModalConfirmAction, ModalProduct } from "../../../modals";
 import { Search } from "../../../search";
 import { useDistribuitionPointProvider } from "../context";
 import { useAuthProvider } from "../../../../context/Auth";
-import { IProduct, IProductCreate } from "../../../../interfaces/products";
+import { IProduct } from "../../../../interfaces/products";
 import { IoWarningOutline } from "react-icons/io5";
 import productOptions from "../../../modals/Product/product.list";
 import { TableRequestesProducts } from "../../../tables/productsRequested";
@@ -22,35 +22,39 @@ export function TabProductsRequested({ distributionPointId, statusSolicitation }
     handleCreateProduct,
     handleDeleteProduct,
     handleUpdateProduct,
+    handleDonateProduct,
     setOpenModalProduct,
     handleProduct,
     setOpenModalUpdateProduct,
     setOpenModalConfirmActionProduct,
+    setOpenModalDonateProduct,
     products,
     openModalProduct,
     openModalUpdateProduct,
     openModalConfirmActionProduct,
-    requesting,
-    distribuitionPoint
-  } = useDistribuitionPointProvider();
+    openModalDonateProduct,
+    requesting  } = useDistribuitionPointProvider();
   const { currentUser } = useAuthProvider();
 
   const [product, setProduct] = React.useState<IProduct>();
 
   const onProduct = async (productId: string, action: "delete" | "update" | "donate") => {
+    if(action === "donate"){
+      setOpenModalDonateProduct(true)
+    }
     const product = await handleProduct(productId);
     setProduct(product);
-
+    
     if (action === "update") {
       setOpenModalUpdateProduct(true);
-    } 
-     else {
+    } else if (action === "donate") {
+      setOpenModalDonateProduct(true);
+    }  else {
       setOpenModalConfirmActionProduct(true);
     }
   };
 // Filtrando os produtos com base no status
-const filteredProducts = products.data.filter((product) => {
- 
+const filteredProducts = products.data.filter((product) => { 
   
   if (statusSolicitation === "requested") {    
     return product.status !== "received";
@@ -61,30 +65,30 @@ const filteredProducts = products.data.filter((product) => {
 });
 
   return (
-    <div>
-      <div className="my-5">
-        <p className="font-semibold mb-2">Filtrar por</p>
-        <div
-          className={`
-            flex flex-col gap-4 md:flex-row
-          `}
-        >
-          <Search
-            className="gap-4 w-full"
-            onFilter={handleFilter}
-            options={[
-              {
-                optionKey: "search",
-                type: "input",
-              },
-              {
-                optionKey: "type",
-                type: "select",
-                options: productOptions
-              },
-            ]}
-          />         
-        </div>
+        <div>
+          <div className="my-5">
+            <p className="font-semibold mb-2">Filtrar por</p>
+            <div
+              className={`
+                flex flex-col gap-4 md:flex-row
+              `}
+            >
+              <Search
+                className="gap-4 w-full"
+                onFilter={handleFilter}
+                options={[
+                  {
+                    optionKey: "search",
+                    type: "input",
+                  },
+                  {
+                    optionKey: "type",
+                    type: "select",
+                    options: productOptions
+                  },
+                ]}
+              />
+          </div>
 
         {!currentUser && (
           <Alert icon={<IoWarningOutline />} type="alert-warning" className="mt-4">
@@ -133,9 +137,10 @@ const filteredProducts = products.data.filter((product) => {
       />
 
       <ModalDonateProduct 
-        close={() => setOpenModalConfirmActionProduct(false)}
-        open={openModalConfirmActionProduct}
-        onSubmit={() => handleDeleteProduct(product?.id || "")}
+        close={() => setOpenModalDonateProduct(false)}
+        open={openModalDonateProduct}
+        onSubmit={handleDonateProduct}
+        product={product}
       />
     </div>
   );
