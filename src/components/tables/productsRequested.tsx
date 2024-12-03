@@ -4,24 +4,25 @@ import { IProduct } from "../../interfaces/products";
 import { Table } from "../common";
 import { IColumn } from "../common/Table/interface";
 import { FiEdit, FiTrash2 } from "react-icons/fi";
+import { FaPlus } from "react-icons/fa";
 import { productTypeTranslations } from "./translate";
 
-export interface ITableProductsProps extends ITable {
+export interface ITableProductsRequestesProps extends ITable {
   handleDeleteProduct: (productId: string) => void;
   handleUpdateProduct: (productId: string) => void;
-  handleDonorProduct?: (productId: string) => void;
+  handleDonorProduct: (productId: string) => void;
 }
 
 const btnStyleDefault =
   "p-2 rounded-md border border-solid text-base cursor-pointer transition-all hover:opacity-80";
 
-export function TableProducts({
+export function TableRequestesProducts({
   handleDeleteProduct,
   handleUpdateProduct,
   handleDonorProduct,
   dataSource,
   ...props
-}: ITableProductsProps) {
+}: ITableProductsRequestesProps) {
   const { currentUser } = useAuthProvider();
 
   const columns: IColumn[] = [
@@ -36,8 +37,8 @@ export function TableProducts({
       title: "Tipo",
       dataIndex: "type",
       render: (type) => {
-        // Usando o mapeamento para traduzir o tipo
-        return <p>{productTypeTranslations[type] || type}</p>; // Se o tipo não for encontrado, exibe o valor original
+        
+        return <p>{productTypeTranslations[type] || type}</p>; 
       },
     },
     {
@@ -101,7 +102,28 @@ export function TableProducts({
                   ${product.creator?.id !== currentUser?.id ? "!text-gray-100" : ""}
                 `}
               />
-            </button>           
+            </button>
+            <button
+              className={`
+                 border-black 
+                ${btnStyleDefault} 
+                disabled:border-gray-400 disabled:bg-gray-400 disabled:opacity-100 disabled:cursor-auto
+              `}
+              onClick={() =>
+                !props.requesting &&
+                product.creator?.id === currentUser?.id &&
+                handleDonorProduct(product.id)
+              }
+              disabled={product.creator?.id !== currentUser?.id || props.requesting}
+            >
+              <FaPlus
+                className={`
+                  text-black-600 
+                  ${props.requesting ? "text-gray-100" : ""}
+                  ${product.creator?.id !== currentUser?.id ? "!text-gray-100" : ""}
+                `}
+              />
+            </button>
           </div>
         );
       },

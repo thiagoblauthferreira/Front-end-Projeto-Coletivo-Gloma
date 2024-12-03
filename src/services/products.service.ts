@@ -1,5 +1,5 @@
 import { del, get, patch, post } from "./cg-api.service";
-import { IProductCreate, IProductUpdate, ISearchProducts } from "../interfaces/products";
+import { IProductCreate, IProductDonate, IProductUpdate, ISearchProducts } from "../interfaces/products";
 
 export function listProducts(params: ISearchProducts) {
   return get(`/product`, { params });
@@ -19,4 +19,9 @@ export function deleteProduct(productId: string) {
 
 export function updateProduct(productId: string, data: IProductUpdate) {
   return patch(`/product/${productId}`, { data });
+}
+
+
+export function donateProduct(data: IProductDonate) {
+  return post(`/product/donate`, { data });
 }

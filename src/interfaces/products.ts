@@ -1,21 +1,23 @@
 import { IParamsDefault } from "./default";
 import { IUser } from "./user";
 
-export type ProductType = "perishable" | "not_perishable";
+export type ProductType = "perishable" | "non_perishable";
+export type StatusType = "requested" | "received";
 export interface IProductCreate {
   name: string;
   type: ProductType;
   quantity: number;
-  weight: string;
+  weight?: string | null;
   description: string;
-  distribuitionPointId: string;
+  status: StatusType;
+  distributionPointId: string;
 }
 
 export interface IProductUpdate {
   name?: string;
   type?: ProductType;
   quantity?: number;
-  weight?: string;
+  weight?: string | null;
   description?: string;
 }
 
@@ -23,6 +25,7 @@ export interface IProduct {
   id: string;
   name: string;
   type: ProductType;
+  status: "received" | "requested";
   quantity: number;
   weight?: string;
   description?: string;
@@ -33,6 +36,15 @@ export interface IProduct {
 }
 
 export interface ISearchProducts extends IParamsDefault {
-  distribuitionPointId?: string;
+  distributionPointId?: string;
   type?: string;
+  status?: string;
 }
+
+
+export interface IProductDonate {
+  quantity: number;  
+  productReferenceID: string;
+  weight?: string | null;
+}
+
