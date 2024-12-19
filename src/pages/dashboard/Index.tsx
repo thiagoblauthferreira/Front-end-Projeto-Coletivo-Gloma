@@ -1,27 +1,30 @@
 import { useEffect, useState } from "react";
 import { LoadingScreen } from "../../components/common/LoadingScreen";
-import { listProducts } from "../../services/products.service";
-import { IProduct } from "../../interfaces/products";
+import { listProducts, updateProduct } from "../../services/products.service";
+import { IProduct, IProductUpdate } from "../../interfaces/products";
 import { PieChart, BarChart } from "../../components/charts";
+import { toast } from "react-toastify";
+import { useAuthProvider } from "../../context/Auth";
 
 export default function Dashboard() {
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [products, setProducts] = useState<IProduct[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [filteredProducts, setFilteredProducts] = useState<IProduct[]>([]);
-  const [searchQuery, setSearchQuery] = useState<string>(""); // Adicionando estado de busca
-  const [selectedStatus, setSelectedStatus] = useState<string | null>(null); // Estado para status filtrado
-  const [selectedCategory, setSelectedCategory] = useState<string | null>(null); // Estado para categoria filtrada
+  const [searchQuery, setSearchQuery] = useState<string>("");
+  const [selectedStatus, setSelectedStatus] = useState<string>('');
+  const [selectedCategory, setSelectedCategory] = useState<string>('');
+  const [showCharts, setShowCharts] = useState<boolean>(false); // Estado para exibir/ocultar gráficos
 
-  // Efeito para chamar a função de busca
+  const { currentUser } = useAuthProvider();
+
   useEffect(() => {
     fetchProducts();
   }, []);
-
-  // Função de filtro
+  
   const handleSearch = () => {
     let result = [...products];
-    
+
     if (searchQuery) {
       result = result.filter(product =>
         product.name.toLowerCase().includes(searchQuery.toLowerCase())
@@ -38,8 +41,7 @@ export default function Dashboard() {
 
     setFilteredProducts(result);
   };
-
-  // Função para lidar com mudança nos filtros
+  
   useEffect(() => {
     handleSearch();
   }, [searchQuery, selectedStatus, selectedCategory]);
@@ -49,11 +51,40 @@ export default function Dashboard() {
       setIsLoading(true);
       const response = await listProducts({});
       setProducts(response.data);
+      setFilteredProducts(response.data);
     } catch (err) {
       console.error("Erro ao carregar os produtos:", err);
       setError("Não foi possível carregar os produtos.");
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const handleUpdateStatus = async (productId: string, newStatus: string) => {
+    if (!currentUser || !currentUser.isCoordinator) {
+      toast.error("Acesso negado. Apenas coordenadores podem alterar o status.");
+      return;
+    }
+
+    const confirm = window.confirm(
+      `Tem certeza que deseja alterar o status para "${newStatus}"?`
+    );
+
+    if (!confirm) return;
+
+    try {
+      const data: IProductUpdate = { status: newStatus };
+      const response = await updateProduct(productId, data);
+
+      if (response.success) {
+        toast.success("Status atualizado com sucesso!");
+        fetchProducts();
+      } else {
+        toast.error("Erro ao atualizar o status.");
+      }
+    } catch (error) {
+      console.error("Erro ao atualizar status:", error);
+      toast.error("Erro ao atualizar o status.");
     }
   };
 
@@ -70,7 +101,7 @@ export default function Dashboard() {
       },
     ],
   };
-  
+
   const barChartData = {
     labels: ["Categoria 1", "Categoria 2", "Categoria 3"],
     datasets: [
@@ -107,12 +138,12 @@ export default function Dashboard() {
 
         <select
           value={selectedStatus || ""}
-          onChange={(e) => setSelectedStatus(e.target.value || null)}
+          onChange={(e) => setSelectedStatus(e.target.value || (''))}
           className="p-2 border border-gray-300 rounded mr-4"
         >
           <option value="">Filtrar por Status</option>
-          <option value="requested">Solicitado</option>
-          <option value="received">Recebido</option>
+          <option value="Solicitado">Solicitado</option>
+          <option value="Recebido">Recebido</option>
           <option value="Aprovado">Aprovado</option>
           <option value="Reprovado">Reprovado</option>
           <option value="Pendente">Pendente</option>
@@ -120,12 +151,12 @@ export default function Dashboard() {
 
         <select
           value={selectedCategory || ""}
-          onChange={(e) => setSelectedCategory(e.target.value || null)}
+          onChange={(e) => setSelectedCategory(e.target.value || (''))}
           className="p-2 border border-gray-300 rounded"
         >
           <option value="">Filtrar por Categoria</option>
-          <option value="perishable">Perecível</option>
-          <option value="non_perishable">Não Perecível</option>
+          <option value="Perecível">Perecível</option>
+          <option value="Não Perecível">Não Perecível</option>
         </select>
       </div>
 
@@ -143,19 +174,41 @@ export default function Dashboard() {
                 <p className="text-sm text-gray-600">{product.description}</p>
                 <p className="text-sm text-gray-600">Status: {product.status}</p>
                 <p className="text-sm text-gray-600">Categoria: {product.category}</p>
+                <button
+                  className="mt-2 p-2 bg-blue-500 text-white rounded"
+                  onClick={() => handleUpdateStatus(product.id, "Aprovado")}
+                >
+                  Aprovar
+                </button>
+                <button
+                  className="mt-2 p-2 bg-red-500 text-white rounded"
+                  onClick={() => handleUpdateStatus(product.id, "Reprovado")}
+                >
+                  Reprovar
+                </button>
               </li>
             ))}
           </ul>
         </div>
 
         {/* Gráficos */}
-        <div className="flex flex-col md:flex-row gap-4">
-          <div className="w-full md:w-1/2">
-            <PieChart chartData={pieChartData} title={""} />
-          </div>
-          <div className="w-full md:w-1/2">
-            <BarChart chartData={barChartData} />
-          </div>
+        <div>
+          <button
+            onClick={() => setShowCharts(!showCharts)}
+            className="p-2 bg-gray-300 rounded mb-4"
+          >
+            {showCharts ? "Ocultar Gráficos" : "Exibir Gráficos"}
+          </button>
+          {showCharts && (
+            <div className="flex flex-col md:flex-row gap-4">
+              <div className="w-full md:w-1/2">
+                <PieChart chartData={pieChartData} title="Distribuição de Status" />
+              </div>
+              <div className="w-full md:w-1/2">
+                <BarChart chartData={barChartData} />
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </div>

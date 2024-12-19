@@ -49,3 +49,11 @@ export interface IProductDonate {
   weight?: string | null;
 }
 
+export interface IProductUpdate {
+  status: string;
+  name?: string;
+  description?: string;
+  category?: string;
+}
+
+
