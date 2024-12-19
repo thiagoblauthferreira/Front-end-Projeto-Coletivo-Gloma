@@ -1,16 +1,21 @@
 import React from "react";
 import { Pie } from "react-chartjs-2"; 
-import { Chart, ArcElement, Title, Tooltip, Legend } from 'chart.js'; 
+import { Chart, ChartOptions, ChartData, ArcElement, Title, Tooltip, Legend } from 'chart.js'; 
 
 
 Chart.register(ArcElement, Title, Tooltip, Legend);
 
-const PieChart: React.FC<{ chartData: any, title: string }> = ({ chartData, title }) => {
-  const options = {
+interface PieChartProps {
+  chartData: ChartData<'pie'>;
+  title: string;
+}
+
+const PieChart: React.FC<PieChartProps> = ({ chartData, title }) => {
+  const options: ChartOptions<'pie'> = {
     plugins: {
       title: {
         display: true,
-        text: `${title}`,
+        text: title,
       },
       legend: {
         display: true,

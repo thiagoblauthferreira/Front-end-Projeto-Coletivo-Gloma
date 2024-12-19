@@ -10,6 +10,12 @@ interface GraphicProps {
   type: "food" | "not_food";
 }
 
+interface Product {
+  name: string;
+  qtd: number;
+  weight?: number; 
+}
+
 interface ChartData {
   labels: string[];
   datasets: {
@@ -37,9 +43,28 @@ const Chart: React.FC<GraphicProps> = ({ data, type}) => {
     ],
   });
 
+  // Função para gerar os gráficos de pizza de forma reutilizável
+  const generatePieData = (products: Product[], label: string, isWeight: boolean = false) => {
+    const values = products.map((product) =>
+      isWeight && product.weight ? product.weight : product.qtd
+    );
+
+    return {
+      labels: products.map((product) => productTypeTranslations[product.name]),
+      datasets: [
+        {
+          data: values,
+          backgroundColor: colors,
+          borderColor: ['rgba(0, 0, 0, 1)'],
+          borderWidth: 1,
+        },
+      ],
+    };
+  };
+
   useEffect(() => {
     let title: string = 'title'
-    let products: any[] = []; 
+    let products: Product[] = []; 
     let labels: string[] = []; 
     let quantities: number[] = []; 
 
@@ -58,49 +83,46 @@ const Chart: React.FC<GraphicProps> = ({ data, type}) => {
       quantities = products.map((d) => d.qtd);   
     }
     
-    setDatas({
-      labels: labels,
-      datasets: [
-        {
-          label: `Dados referentes a produtos ${title} doados.`,
-          data: quantities,
-          backgroundColor: colors
-          ,
-          borderColor: [
-            'rgba(0, 0, 0, 1)'
+    // Só atualiza o estado se houver mudança nos dados
+    setDatas((prevState) => {
+      if (
+        prevState.labels.toString() !== labels.toString() ||
+        prevState.datasets[0].data.toString() !== quantities.toString()
+      ) {
+        return {
+          labels: labels,
+          datasets: [
+            {
+              label: `Dados referentes a produtos ${title} doados.`,
+              data: quantities,
+              backgroundColor: colors,
+              borderColor: ["rgba(0, 0, 0, 1)"],
+              borderWidth: 1,
+            },
           ],
-          borderWidth: 1,
-        },
-      ],
+        };
+      }
+      return prevState;
     });
   }, [data, type]);
 
   return (
     <div>
-  {type === "not_food" ? (
-    <BarChart chartData={datas} />
-  ) : (
-    <>
-      {/* Gráfico de Pizza para Quantidade */}
-      <PieChart chartData={datas} title={"Gráfico de alimentos em quantidade"} />
-
-      {/* Gráfico de Pizza para Peso */}
-      <PieChart
-              chartData={{
-                labels: data.productsFood.map((product) => productTypeTranslations[product.name]), // Obter os labels
-                datasets: [
-                  {
-                    data: data.productsFood.map((product) => product.weight),
-                    backgroundColor: colors,
-                    borderColor: ['rgba(0, 0, 0, 1)'],
-                    borderWidth: 1,
-                  },
-                ],
-              }} title={"Gráfico de alimentos em peso."}      />
-    </>
-  )}
-</div>
-
+      {type === "not_food" ? (
+        <BarChart chartData={datas} />
+      ) : (
+        <>
+          {/* Gráfico de Pizza para Quantidade */}
+          <PieChart chartData={generatePieData(data.productsFood, "Gráfico de alimentos em quantidade")} title={"Gráfico de alimentos em quantidade"} />
+          
+          {/* Gráfico de Pizza para Peso */}
+          <PieChart 
+            chartData={generatePieData(data.productsFood, "Gráfico de alimentos em peso", true)} 
+            title={"Gráfico de alimentos em peso"} 
+          />
+        </>
+      )}
+    </div>
   );
 };
 

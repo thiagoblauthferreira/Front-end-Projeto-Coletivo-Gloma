@@ -24,3 +24,5 @@ yarn-debug.log*
 yarn-error.log*
 
 /certificados
+
+*storybook.log

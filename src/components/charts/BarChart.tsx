@@ -5,10 +5,30 @@ import { Chart, CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend }
 
 Chart.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
 
-const BarChart: React.FC<{ chartData: any }> = ({ chartData }) => {
+interface BarChartProps {
+  chartData: {
+    labels: string[];
+    datasets: {
+      label: string;
+      data: number[];
+      backgroundColor: string[];
+      borderColor?: string[]; 
+      borderWidth?: number; 
+    }[];
+  };
+  width?: number;  // Permitindo que o tamanho seja configurado
+  height?: number; // Permitindo que a altura também seja configurada
+}
+
+const BarChart: React.FC<BarChartProps> = ({ chartData, width = 1000, height = 500 }) => {
   return (
-    <div style={{ width: 1000 }}>
-      <Bar data={chartData} />
+    <div style={{ width, height}}>
+      <Bar data={chartData} 
+      options={{
+        responsive: true,
+        maintainAspectRatio: false,
+      }}
+      />
     </div>
   );
 };
