@@ -1,11 +1,10 @@
 import React, { InputHTMLAttributes } from "react";
-import { FieldErrors, FieldValues, UseFormRegister } from "react-hook-form";
+import { FieldErrors, FieldValues } from "react-hook-form";
 import { getNestedValue } from "../../utils";
 
 interface IInputProps extends InputHTMLAttributes<HTMLInputElement> {
   label?: string;
   errors?: FieldErrors<FieldValues>;
-  register?: UseFormRegister<FieldValues>;
   containerClassName?: string;
   mask?: (value: any) => any;
 }

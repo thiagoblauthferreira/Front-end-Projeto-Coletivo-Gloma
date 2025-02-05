@@ -1,14 +1,18 @@
 import React from "react";
-import { IAuthProvider, IContextProvider } from "./interface";
 import { IUser } from "../../interfaces/user";
 import { getUser } from "../../services/user.service";
+import { IAuthProvider, IContextProvider } from "./interface";
 import { delCookie, getCookie } from "../../services/cookie.service";
+import { ISettings } from "../../interfaces/settings";
+import { defaultSettings } from "../../utils/default";
 
 const AuthContext = React.createContext<IAuthProvider>({} as IAuthProvider);
 
 export function AuthProvider({ children }: IContextProvider) {
   const [currentUser, setCurrentUser] = React.useState<IUser | null>(null);
   const [status, setStatus] = React.useState<string>("pending");
+
+  const [settings] = React.useState<ISettings>(defaultSettings);
 
   const logout = async () => {
     delCookie("token");
@@ -42,7 +46,7 @@ export function AuthProvider({ children }: IContextProvider) {
   }, []);
 
   return (
-    <AuthContext.Provider value={{ currentUser, status, loginUser, logout }}>
+    <AuthContext.Provider value={{ currentUser, status, settings, loginUser, logout }}>
       {children}
     </AuthContext.Provider>
   );

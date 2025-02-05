@@ -1,31 +1,26 @@
 import React from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Link, useNavigate } from "react-router-dom";
-import { FormFieldConstructor } from "../../../components/common/FormField";
-import { LoginSchema } from "../../../validators/login.validator";
+import { useNavigate } from "react-router-dom";
 import { login } from "../../../services/auth.service";
 import { setCookie } from "../../../services/cookie.service";
 import { ILogin } from "../../../interfaces/auth";
 import { useAuthProvider } from "../../../context/Auth";
-import { LoadingScreen } from "../../../components/common";
+import { Input, Link, LoadingScreen } from "../../../components/common";
 import { toast } from "react-toastify";
 import { toastMessage } from "../../../helpers/toast-message";
+import { LoginSchema } from "./validator";
 
-interface LoginComponentProps {}
-
-function LoginPointScreen(props: LoginComponentProps) {
+function LoginPointScreen() {
   const {
     register,
     handleSubmit,
     formState: { errors },
-    setError,
   } = useForm<ILogin>({
     resolver: zodResolver(LoginSchema),
-    mode: "onBlur",
   });
   const navigate = useNavigate();
-  const { loginUser } = useAuthProvider();
+  const { loginUser, settings } = useAuthProvider();
 
   const [requesting, setRequesting] = React.useState<boolean>(false);
 
@@ -54,52 +49,52 @@ function LoginPointScreen(props: LoginComponentProps) {
     }
   }
 
-  const FormField = FormFieldConstructor<ILogin>();
-
   return (
     <section className="login-section">
       <LoadingScreen />
-      <div className="hero min-h-screen bg-base-200">
-        <div className="hero-content flex flex-col">
-          <div className="text-center">
-            <h1 className="text-5xl pb-5 font-bold">Login</h1>
-          </div>
-          <div className="card shrink-0 w-full max-w-sm shadow-2xl bg-base-100 md:px-10">
-            <form className="card-body" onSubmit={handleSubmit(onSubmit)}>
-              <FormField
-                name="email"
-                register={register}
-                setError={setError}
-                error={errors?.email}
-                inputProps={{
-                  type: "email",
-                  placeholder: "Seu Email",
-                }}
-              />
-              <FormField
-                name="password"
-                register={register}
-                setError={setError}
-                error={errors.password}
-                inputProps={{
-                  type: "password",
-                  placeholder: "Sua senha",
-                }}
-              />
-              <label className="label">
-                <a href="#" className="label-text-alt link link-hover">
-                  Esqueceu a senha?
-                </a>
-              </label>
-              <div className="form-control mt-6">
-                <button className="btn btn-primary">Login</button>
-              </div>
-              <label className="label">
-                <Link to={"/auth/register"} className="label-text-alt link link-hover">
-                  Não tem uma conta?
-                </Link>
-              </label>
-            </form>
+
+      <div className="hero min-h-screen bg-base-200 py-4">
+        <div className="hero-content w-full">
+          <div className="card shrink-0 w-full max-w-md shadow-2xl bg-base-100 rounded-lg">
+            <div className="card-body">
+              <h1 className="text-4xl pb-5 text-center font-semibold">Login</h1>
+
+              <form className="space-y-3" onSubmit={handleSubmit(onSubmit)}>
+                <Input
+                  label="Email: "
+                  type="email"
+                  placeholder="Digite o seu email"
+                  {...register("email")}
+                  errors={errors}
+                />
+
+                <Input
+                  label="Senha: "
+                  type="password"
+                  placeholder="Digite sua senha"
+                  {...register("password")}
+                  errors={errors}
+                />
+
+                <div className="form-control">
+                  <button className="btn btn-primary rounded-lg">Login</button>
+                </div>
+              </form>
+
+              <Link
+                href="/auth/register"
+                className="link link-hover w-full text-center mt-4"
+              >
+                Não tem uma conta?
+              </Link>
+
+              <Link
+                href={settings.support}
+                className="link text-blue-500 hover:text-blue-600 underline w-full text-center mt-4"
+              >
+                suporte
+              </Link>
+            </div>
           </div>
         </div>
       </div>

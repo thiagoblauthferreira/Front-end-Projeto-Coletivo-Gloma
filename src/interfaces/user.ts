@@ -7,7 +7,7 @@ export interface IUserCreate {
   email: string;
   username: string;
   password: string;
-  address: IAddress;
+  address?: IAddress;
   phone?: string;
   birthDate?: Date;
   isDonor?: boolean;
