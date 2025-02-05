@@ -6,8 +6,8 @@ import { useAuthProvider } from "../../../context/Auth";
 import { toast } from "react-toastify";
 import { toastMessage } from "../../../helpers/toast-message";
 import { setCookie } from "../../../services/cookie.service";
-import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
 import { RegisterSchema } from "./validator";
 import { IRegister } from "./interface";
 
