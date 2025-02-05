@@ -41,3 +41,7 @@ export function removeCoordinator(shelterId: string, data: IAddOrRemoveCoordinat
     data: { action: "remove", ...data },
   });
 }
+
+export function listShelterByCoordinator(coordinatorId: string, params?: any) {
+  return get(`/shelter/${coordinatorId}/shelters`, { params });
+}

@@ -14,3 +14,12 @@ export const phoneMask = (value: string) => {
   value = value.replace(/(\d)(\d{4})$/, "$1-$2");
   return value;
 };
+
+export const weightMask = (value: string) => {
+  if (!value) return "";
+  const valueClean = value.replace(/\D/g, '');
+  const intPart = valueClean.slice(0, -2);
+  const decimalPart = valueClean.slice(-2);
+  const weightFormatted = intPart + '.' + decimalPart;
+  return weightFormatted;  
+};

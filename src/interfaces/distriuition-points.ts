@@ -30,4 +30,5 @@ export interface IDistribuitionPoint {
   deletedAt?: Date;
 }
 
+
 export interface ISearchDistribuitionPoint extends IParamsDefault {}

@@ -11,6 +11,8 @@ import CoordinatorsScreen from "../pages/shelters/id";
 import DistribuitionPointsScreen from "../pages/distribuition-points";
 import DistribuitionPointScreen from "../pages/distribuition-points/id";
 import  ProfileScreen from "../pages/profile"
+import DemandsPointScreen from "../pages/demand-point";
+import DemandPointScreen from "../pages/demand-point/id";
 
 export function RoutesPage() {
   return (
@@ -27,6 +29,18 @@ export function RoutesPage() {
             path="/distribuition-points/:id"
             element={<DistribuitionPointScreen />}
           />
+
+          <Route
+            path="/demands-point"
+            element={<DemandsPointScreen />}
+          />
+          
+          <Route
+            path="/demand-point/:id"
+            element={<DemandPointScreen />}
+          />
+       
+       
           <Route element={<PrivateRoute />}>
             <Route path="/shelters" element={<SheltersScreen />} />
             <Route path="/profile" element={<ProfileScreen />} />

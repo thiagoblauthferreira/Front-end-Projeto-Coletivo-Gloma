@@ -1,24 +1,25 @@
 import { useForm } from "react-hook-form";
 import { Button, Modal, Tabs } from "../../common";
+import { distributionPointSchema } from "../../../validators";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { TabShelter } from "./Tabs/Shelter";
 import { TabAddress } from "./Tabs/Address";
-import { IShelterCreate } from "../../../interfaces/shelter";
-import { shelterSchema } from "../../../validators";
+import { IDemandPointCreate } from "../../../interfaces/demand-point";
+import { TabDemandPoint } from "./Tabs/DemandPoint";
+import { demandPointSchema } from "../../../validators/demand-point";
 
-interface IShelter {
+interface IDemandPoint {
   close: () => void;
   open: boolean;
-  onSubmit: (data: IShelterCreate) => void;
+  onSubmit: (data: IDemandPointCreate) => void;
 }
 
-export function ModalShelter({ close, open, onSubmit }: IShelter) {
+export function ModalDemandPoint({ close, open, onSubmit }: IDemandPoint) {
   const {
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm<IShelterCreate>({
-    resolver: zodResolver(shelterSchema),
+  } = useForm<IDemandPointCreate>({
+    resolver: zodResolver(demandPointSchema),
   });
 
   return (
@@ -27,7 +28,7 @@ export function ModalShelter({ close, open, onSubmit }: IShelter) {
       close={close}
       header={
         <div className="p-4">
-          <p className="font-semibold text-lg">Criar abrigo</p>
+          <p className="font-semibold text-lg">Criar ponto de demanda</p>
         </div>
       }
     >
@@ -37,8 +38,8 @@ export function ModalShelter({ close, open, onSubmit }: IShelter) {
             tabs={[
               {
                 key: "tab_one",
-                label: "Abrigo",
-                children: <TabShelter register={register} errors={errors} />,
+                label: "Ponto de demanda",
+                children: <TabDemandPoint register={register} errors={errors} />,
               },
               {
                 key: "tab_two",
@@ -47,7 +48,6 @@ export function ModalShelter({ close, open, onSubmit }: IShelter) {
               },
             ]}
           />
-
           <Button
             type="submit"
             text="Cadastrar"

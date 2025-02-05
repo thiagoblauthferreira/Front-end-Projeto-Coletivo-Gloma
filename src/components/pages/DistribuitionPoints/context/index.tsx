@@ -6,9 +6,10 @@ import {
 } from "./interface";
 import {
   deleteDistribuitionPoint,
+  listStaticsDistribuitionPointRequested,
   updateDistribuitionPoints,
 } from "../../../../services/distribuition-points.service";
-import { IProductCreate, IProductUpdate } from "../../../../interfaces/products";
+import { IProductCreate, IProductDonate, IProductUpdate } from "../../../../interfaces/products";
 import {
   IDistribuitionPoint,
   IDistribuitionPointUpdate,
@@ -17,6 +18,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import {
   createProduct,
   deleteProduct,
+  donateProduct,
   listOneProduct,
   listProducts,
   updateProduct,
@@ -24,6 +26,7 @@ import {
 import { toast } from "react-toastify";
 import { toastMessage } from "../../../../helpers/toast-message";
 import { IPaginate } from "../../../common/Table/interface";
+import { IProductInventory } from "../../../../interfaces/statistics";
 
 const DistribuitionPointContext = React.createContext<IDistribuitionPointProvider>(
   {} as IDistribuitionPointProvider
@@ -33,6 +36,7 @@ export function DistribuitionPointProvider({
   children,
   initialDistribuitionPoint,
   initialProducts,
+  initialIStatistics
 }: IContextProvider) {
   const { id = "" } = useParams();
   const navigation = useNavigate();
@@ -48,7 +52,10 @@ export function DistribuitionPointProvider({
     React.useState<boolean>(false);
   const [openModalUpdateProduct, setOpenModalUpdateProduct] =
     React.useState<boolean>(false);
+    const [openModalDonateProduct, setOpenModalDonateProduct] =
+    React.useState<boolean>(false);
   const [products, setProducts] = React.useState<IProductsInitialData>(initialProducts);
+  const [statistics, setStatistics] = React.useState<IProductInventory>(initialIStatistics);
   const [distribuitionPoint, setDistribuitionPoint] = React.useState<IDistribuitionPoint>(
     initialDistribuitionPoint
   );
@@ -84,7 +91,6 @@ export function DistribuitionPointProvider({
 
     try {
       setRequesting(true);
-
       const resp = await listProducts(filteredRef.current);
       setProducts(resp);
     } catch (error) {
@@ -116,7 +122,7 @@ export function DistribuitionPointProvider({
         };
       });
       setOpenModalProduct(false);
-
+      handleStatistics(newData.distributionPointId)
       toast.success("Novo produto criado ao ponto de distribuição");
     } catch (error) {
       console.error(error);
@@ -126,7 +132,38 @@ export function DistribuitionPointProvider({
     }
   };
 
+  const handleDonateProduct = async (data: IProductDonate) => {
+    if (requesting) {
+      toast.warn(toastMessage.REQUESTING);
+      return;
+    } 
+    data.quantity = Number(data.quantity)
+
+    try {
+      setRequesting(true);
+
+      const respProduct = await donateProduct(data);
+
+      setProducts((currentProducts) => {
+        return {
+          data: [respProduct, ...currentProducts.data],
+          total: currentProducts.total + 1,
+        };
+      });
+      setOpenModalDonateProduct(false);
+      handleStatistics(distribuitionPoint.id)
+      handleProducts();
+      toast.success("Novo produto doado ao ponto de distribuição");
+    } catch (error) {
+      console.error(error);
+      toast.error(toastMessage.INTERNAL_SERVER_ERROR);
+    } finally {
+      setRequesting(false);
+    }
+  };
+
   const handleUpdateProduct = async (productId: string, data: IProductUpdate) => {
+      
     if (requesting) {
       toast.warn(toastMessage.REQUESTING);
       return;
@@ -134,7 +171,7 @@ export function DistribuitionPointProvider({
 
     const newData = { ...data, distribuitionPointId: id };
     newData.quantity = Number(data.quantity);
-
+    
     try {
       setRequesting(true);
 
@@ -147,15 +184,13 @@ export function DistribuitionPointProvider({
             return { ...product, ...respProduct };
           }
           return product;
-        });
-
+        });        
         return {
           ...currentProducts,
           data: filteredProducts,
         };
-      });
+      });     
       setOpenModalProduct(false);
-
       toast.success("Produto atualizado");
     } catch (error) {
       console.error(error);
@@ -246,6 +281,20 @@ export function DistribuitionPointProvider({
     }
   };
 
+  const handleStatistics = async (distribuitionPointId: string) => {
+    if (requesting) {
+      toast.warn(toastMessage.REQUESTING);
+      return;
+    }
+    try {
+      const data = await listStaticsDistribuitionPointRequested(distribuitionPointId)
+      setStatistics(data);
+    } catch (error) {
+      console.log(error)
+      toast.error(toastMessage.INTERNAL_SERVER_ERROR);
+    }
+
+  }
   return (
     <DistribuitionPointContext.Provider
       value={{
@@ -255,20 +304,25 @@ export function DistribuitionPointProvider({
         setOpenModalUpdateProduct,
         setOpenModalConfirmActionProduct,
         setOpenModalConfirmActionDP,
+        setOpenModalDonateProduct,
         handleCreateProduct,
+        handleDonateProduct,
         handleUpdateProduct,
         handleDeleteProduct,
         handleProduct,
         handleUpdateDistribuitionPoint,
         handleDeleteDistribuitionPoint,
         updateDistribuitionPointState,
+        handleStatistics,
         products,
         openModalProduct,
         openModalUpdateProduct,
         openModalConfirmActionProduct,
         openModalConfirmActionDP,
+        openModalDonateProduct,
         distribuitionPoint,
         requesting,
+        statistics,
       }}
     >
       {children}
