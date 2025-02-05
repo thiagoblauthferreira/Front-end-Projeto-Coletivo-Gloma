@@ -1,9 +1,9 @@
 import React from "react";
+import { toast } from "react-toastify";
 import { createUser } from "../../../services/auth.service";
 import { Input, Link, LoadingScreen } from "../../../components/common";
 import { useNavigate } from "react-router-dom";
 import { useAuthProvider } from "../../../context/Auth";
-import { toast } from "react-toastify";
 import { toastMessage } from "../../../helpers/toast-message";
 import { setCookie } from "../../../services/cookie.service";
 import { zodResolver } from "@hookform/resolvers/zod";
